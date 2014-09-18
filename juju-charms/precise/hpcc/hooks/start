@@ -1,0 +1,25 @@
+#!/bin/bash -e
+# Here put anything that is needed to start the service.
+# Note that currently this is run directly after install
+# i.e. 'service apache2 start'
+juju-log "Entering start"
+
+#export PS4='+${BASH_SOURCE[1]} ${LINENO}'
+#set -x
+
+. ${CHARM_DIR}/hooks/hpcc-common
+
+juju-log "Before calling parse_env_config"
+parse_env_config
+juju-log "Completed parse_env_config"
+
+if [ ! -e ${PATH_HOME}/.ssh/id_rsa ]
+then
+   juju-log "Before calling create_and_set_ssh_keys"
+   create_and_set_ssh_keys
+   juju-log "Completed create_and_set_ssh_keys"
+fi
+
+juju-log "Before calling start_and_check"
+start_and_check
+exit $?

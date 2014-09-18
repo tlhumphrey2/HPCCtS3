@@ -1,0 +1,410 @@
+#!/usr/bin/perl
+=pod
+./HtS3 -nodes 10 -service jack-in-box deploy
+./HtS3 -nodes 3
+./HtS3 -nodes 10
+=cut
+local $pdir=$1 if $0 =~ /^(.+)\//;
+if ( $pdir eq '.' ){
+   $pdir=`pwd`;chomp $pdir;
+}
+local $home=$1 if $pdir =~ /^(\/home\/.+?)\//;
+print "home=\"$home\"\n";
+local $thor_info_pl="$home/thor_info.pl";
+print "File containing info about ESP is \"$thor_info_pl\"\n";
+
+local ($esp_unit_id, $esp_unit_number, $esp_private_ip, $esp_public_ip, @slave_unit_numbers);
+print "Just before gettng arguments.\n";
+#================== Get Arguments ================================
+require "$pdir/newgetopt.pl";
+if ( ! &NGetOpt(
+                "nodes=s", "service=s"
+                ))      # Add Options as necessary
+{
+  print STDERR "\n[$0] -- ERROR -- Invalid/Missing options...\n\n";
+  exit(1);
+}
+
+local $nodes;
+if ( $opt_nodes =~ /^\s*$/  ){
+   if ( -e $thor_info_pl ){
+      require "$thor_info_pl";
+   }
+   else{
+      die "USAGE ERROR: $0 -node <number of nodes> REQUIRED.\n";
+   }
+}
+else{
+      $nodes=$opt_nodes;
+}
+print "nodes=\"$nodes\"\n";
+local @unit_numbers = 0 .. ($nodes-1);
+$service = $opt_service || 'tlh-hpcc';
+#=================================================================
+print "Have all inputted arguments.\n";
+
+local $opt_goto;
+if ( scalar(@ARGV) > 0 ){
+   $opt_goto = shift @ARGV;
+
+   if ( scalar(@ARGV) > 0 ){
+     $nodes = shift @ARGV;
+     @unit_numbers = 0 .. ($nodes-1);
+   }
+
+   goto "$opt_goto";
+}
+else{
+  $opt_goto='boot';
+}
+
+boot:
+bootstrap:
+#----------------------------------------------
+#   BOOTSTRAP
+#----------------------------------------------
+
+# If $thor_info_pl file exists, delete it.
+system("rm -f $thor_info_pl") if -e $thor_info_pl;
+
+$_=`juju status 2> /dev/null`;
+if ( /agent-state/ ){
+  print("juju destroy-environment amazon\n");
+  system("juju destroy-environment amazon");
+  sleep(10);
+}
+
+print("juju bootstrap\n");
+system("juju bootstrap");
+
+$_=`juju status`;
+print $_;
+while ( ! /started/is ){
+   print "Wait for boot to start.\n";
+   sleep(5);
+   $_=`juju status`;
+   print $_;
+}
+
+sleep(5);
+#----------------------------------------------
+#   END BOOTSTRAP
+#----------------------------------------------
+
+deploy:
+deploy_only:
+#----------------------------------------------
+#   DEPLOY
+#----------------------------------------------
+
+# If $thor_info_pl file exists, delete it.
+system("rm -f $thor_info_pl") if -e $thor_info_pl;
+
+# Change 'tlh-hpcc' in $hooks/common.pl to ${service}.
+updateCommonWithService($service);
+
+print("juju deploy --constraints=\"instance-type=m3.large\" --repository=. local:precise/hpcc ${service} -n $nodes\n");
+system("cd $home/HPCCtS3/juju-charms;juju deploy --constraints=\"instance-type=m3.large\" --repository=. local:precise/hpcc ${service} -n $nodes");
+sleep(1);
+$_=`./juju-status.pl $service`;
+print $_;
+local @unit_status = m/agent-state:.+?(?=\n)/sg;
+local @started = grep(/started/,@unit_status);
+while ( scalar(@started) != scalar(@unit_status) ){
+   print "Wait for all service units to start.\n";
+   sleep(3);
+   $_=`./juju-status.pl $service`;
+   @unit_status = m/agent-state:.+?(?=\n)/sg;
+   @started = grep(/started/,@unit_status);
+   print $_;
+}
+
+print "All service units have started. Expose service\n\n";
+
+exit if $opt_goto eq 'deploy_only';
+#----------------------------------------------
+#   END DEPLOY
+#----------------------------------------------
+
+expose:
+expose_only:
+#----------------------------------------------
+#   EXPOSE
+#----------------------------------------------
+print("juju expose ${service}\n\n");
+system("juju expose ${service}");
+
+exit if $opt_goto eq 'expose_only';
+
+sleep(20);
+#----------------------------------------------
+#   END EXPOSE
+#----------------------------------------------
+
+thor_info:
+thor_info_only:
+#----------------------------------------------
+#   ESP INFO
+#----------------------------------------------
+print "thor_info\n";
+get_thor_info();
+
+$hpcc_ready=0;
+while( ! $hpcc_ready  ){
+  # As proof that HPCC is fully ready, I'm using dfuplus to get list of files on thor. If I get list then HPCC is ready.
+  $_=`juju ssh ${service}/$esp_unit_number /var/lib/juju/agents/unit-${service}-$esp_unit_number/charm/hooks/list_files.pl 2> /dev/null`;
+  if ( /DID NOT get list of files/ ){
+     system("rm -f $thor_info_pl") if -e $thor_info_pl;
+     print "Waiting for HPCC to be fully ready.\n";
+     sleep(5);
+     get_thor_info();
+  }
+  else{
+     $hpcc_ready=1;
+  }
+}
+
+print "HPCC is ready.\n";
+
+exit if ($opt_goto eq 'expose_only') || ($opt_goto eq 'thor_info_only');
+
+if ( $opt_goto =~ /^cp2s3/ ){
+   $opt_goto = '';
+   goto "cp2s3";
+}
+exit;
+#----------------------------------------------
+#   END ESP INFO
+#----------------------------------------------
+
+
+cpfs3:
+#----------------------------------------------
+#   COPY FROM S3
+#----------------------------------------------
+print "\ncpfs3.\n";
+
+get_thor_info();
+
+local $unit_error_log = "/home/user/${service}-esp_cpfs3.log";
+
+my $u = $esp_unit_number;
+print "Copy LZ and Metadata files from S3 to Master.\n";
+system("juju ssh ${service}/$u /var/lib/juju/agents/unit-${service}-$esp_unit_number/charm/hooks/cpLZAndMetadataFilesFromS3ToMaster.pl&");
+
+foreach my $u (@slave_unit_numbers){
+  print "Copy file parts from S3 to slave node (${service}/$u).\n";
+  system("juju ssh ${service}/$u /var/lib/juju/agents/unit-${service}-$u/charm/hooks/cpAllFilePartsFromS3ToThisSlaveNode.pl&");
+}
+
+print "Completed copying from S3 to all nodes of thor.\n";
+
+restore:
+print "restore\n";
+iscpfs3:
+print "iscpfs3\n" if $opt_goto eq 'iscpfs3';
+
+print "Make sure all files have been copied before attempting RestoreLogicalFiles.\n";
+get_thor_info();
+loopUntilAllFilesCopiedFromS3($service);
+exit if $opt_goto eq 'iscpfs3';
+
+local $_=`juju ssh ${service}/$esp_unit_number /var/lib/juju/agents/unit-${service}-$esp_unit_number/charm/hooks/RestoreLogicalFiles.pl`;
+#local $restore_error_log = "/home/user/${service}_restore.log";
+#open(OUT,">$restore_error_log") || die "Can't open for output \"$restore_error_log\"\n";
+#print OUT "$_\n";
+#close(OUT);
+
+exit;
+#----------------------------------------------
+#   END COPY FROM S3
+#----------------------------------------------
+
+cp2s3:
+cp2s3_only:
+#----------------------------------------------
+#   COPY FILES TO S3
+#----------------------------------------------
+
+get_thor_info();
+
+print "\nDoing cp2s3\n\n";
+
+print "First, remove anything currently in S3 buckets.\n";
+print("cd /home/user/hpcc-20140819;./rmS3Buckets.pl\n");
+system("cd /home/user/hpcc-20140819;./rmS3Buckets.pl");
+
+foreach my $u (@unit_numbers){
+  print "\nCopy from unit=$u.\n";
+  local $WhatWasCopied = ($u eq $esp_unit_number)? "metadata files and dropzone files" : "file parts";
+  local $NodeCopiedFrom = ($u eq $esp_unit_number)? "esp (${service}/$u)" : "slave node (${service}/$u)";
+
+  $cpToS3="/var/lib/juju/agents/unit-${service}-$u/charm/hooks/cpToS3.pl";
+  print("juju ssh ${service}/$u $cpToS3\&\n");
+  system("juju ssh ${service}/$u $cpToS3&");
+}
+exit;
+#----------------------------------------------
+#  END COPY FILES TO S3
+#----------------------------------------------
+
+wait_cp2s3:
+
+get_thor_info();
+loopUntilAllFilesCopiedToS3($service);
+
+destroy:
+destroy_environment:
+print "destroy\n";
+#----------------------------------------------
+#   DESTROY ENVIRONMENT
+#----------------------------------------------
+print("rm -f $thor_info_pl\n");
+system("rm -f $thor_info_pl");
+print("juju destroy-environment amazon\n");
+system("juju destroy-environment amazon");
+exit;
+#----------------------------------------------------
+# SUBROUTINES
+#----------------------------------------------------
+sub get_thor_info{
+  
+  if ( -e $thor_info_pl ){
+     print "require \"$thor_info_pl\"\n";
+     require $thor_info_pl;
+     print "\n\nesp_unit_id=\"$esp_unit_id\", esp_unit_number=\"$esp_unit_number\", esp_private_ip=\"$esp_private_ip\", esp_public_ip=\"$esp_public_ip\"\n";
+     print "\@slave_unit_numbers=(",join(",",@slave_unit_numbers),")\n";
+     return;
+  }
+  
+get_thor_info0:  
+  print("Use get_url.sh to get the unit id of the ESP as well as its private and public IP addresses.\n");
+  my $thor_info = `cd $home/HPCCtS3/juju-charms/precise/hpcc/bin;./get_url.sh`;
+
+  my @e=split(/\n/,$thor_info);
+  my $esp_id_info;
+  ( $esp_id_info ) = grep(/Unit, ${service}\/\d+, is the ESP. Its private ip is /i,@e);
+  print "$esp_id_info\n";
+
+  # Get unit-id, private ip and public ip of ESP (and in our case, also the master)
+  $_ = $esp_id_info;
+  my $ip_re='\d+(?:\.\d+){3}';
+
+  if ( /Unit, (${service}\/\d+), is the ESP. Its private ip is ($ip_re) and its public ip is ($ip_re)/i ){
+     $esp_unit_id = $1;
+     $esp_private_ip = $2;
+     $esp_public_ip = $3;
+     $esp_unit_number = $1 if $esp_unit_id =~ /\/(\d+)/;
+     @slave_unit_numbers = grep(!/\b$esp_unit_number\b/,@unit_numbers);
+     print "\n\nesp_unit_id=\"$esp_unit_id\", esp_unit_number=\"$esp_unit_number\", esp_private_ip=\"$esp_private_ip\", esp_public_ip=\"$esp_public_ip\"\n";
+     print "\@slave_unit_numbers=(",join(",",@slave_unit_numbers),")\n";
+     print "Store esp info in \"$thor_info_pl\"\n";
+     open(OUT,">$thor_info_pl") || die "Can't open for output: \"$thor_info_pl\"\n";
+     print OUT "\$home=\"$home\";\n";
+     print OUT "\$service=\"$service\";\n";
+     print OUT "\$nodes=$nodes;\n";
+     print OUT "\$esp_unit_id=\"$esp_unit_id\";\n";
+     print OUT "\$esp_private_ip=\"$esp_private_ip\";\n";
+     print OUT "\$esp_public_ip=\"$esp_public_ip\";\n";
+     print OUT "\$esp_unit_number=$esp_unit_number;\n";
+     for(my $i=0; $i < scalar(@unit_numbers); $i++){
+        print OUT "\$unit_numbers\[$i\]=$unit_numbers[$i];\n";
+     }
+     for(my $i=0; $i < scalar(@slave_unit_numbers); $i++){
+        print OUT "\$slave_unit_numbers\[$i\]=$slave_unit_numbers[$i];\n";
+     }
+     print OUT "1;\n";
+     close(OUT);
+  }
+  else{
+     print "\nERROR: Cannot parse esp_id_info and extract esp id, private and public ips.\n";
+     print "Outputting $home/bug.txt\n";
+     open(BUG,">$home/bug.txt") || die "Can't open for output: \"$home/bug.txt\"\n";
+     print BUG $thor_info;
+     close(BUG);
+     
+     goto "get_thor_info0";
+  }
+}
+#----------------------------------------------------
+sub isFilesCopiedFromS3{
+my ( $service, @units )=@_;
+  my @not_copied_units=();
+  foreach my $u (@units){
+     $_=`juju ssh ${service}/$u /var/lib/juju/agents/unit-${service}-$u/charm/hooks/isFilesCopiedFromS3.sh 2> /dev/null`;
+     if ( ! /Files copied from S3 to this unit/ ){
+        print "${service}/$u S3 has NOT copied its files to node.\n";
+        push @not_copied_units, $u;
+     }
+     else{
+        print "${service}/$u S3 has copied its files to node.\n";
+     }
+  }
+
+@units = @not_copied_units;
+return @units;
+}
+#----------------------------------------------------
+# call: loopUntilAllFilesCopiedFromS3($service);
+sub loopUntilAllFilesCopiedFromS3{
+my ( $service )=@_;
+
+my @units = @slave_unit_numbers;
+unshift @units, $esp_unit_number;
+
+do{
+   @units = isFilesCopiedFromS3($service, @units);
+} while ( scalar(@units) != 0 );
+
+print "All Files Have Been Copied from S3.\n";
+}
+#----------------------------------------------------
+sub isFilesCopiedToS3{
+my ( $service, @units )=@_;
+  $AllFilesCopiedToS3=1;
+  my @not_copied_units=();
+  foreach my $u (@units){
+     $_=`juju ssh ${service}/$u /var/lib/juju/agents/unit-${service}-$u/charm/hooks/isFilesCopiedToS3.sh`;
+     if ( ! /Files copied to S3 from this unit/ ){
+        print "${service}/$u has NOT copied its files to S3.\n";
+        $AllFilesCopiedToS3=0;
+        push @not_copied_units, $u;
+     }
+     else{
+        print "${service}/$u has copied its files to S3.\n";
+     }
+  }
+
+  @units = @not_copied_units;
+return @units;
+}
+#----------------------------------------------------
+# call: loopUntilAllFilesCopiedToS3($service);
+sub loopUntilAllFilesCopiedToS3{
+my ( $service )=@_;
+
+my @units = @slave_unit_numbers;
+unshift @units, $esp_unit_number;
+
+do{
+   @units=isFilesCopiedToS3($service,@units);
+} while ( scalar(@units) != 0 );
+
+print "All Files Have Been Copied to S3.\n";
+}
+#----------------------------------------------------
+sub updateCommonWithService{
+my ( $service )=@_;
+  my $common_path="$home/HPCCtS3/juju-charms/precise/hpcc/hooks/common.pl";
+  my $save_delim=$/;
+  undef $/;
+  open(IN,$common_path) || die "In HtS3::updateCommonWithService. Can't open for input: \"$common_path\"\n";
+  local $_=<IN>;
+  close(IN);
+  s/tlh-hpcc/$service/sg;
+  open(OUT,">$common_path") || die "In HtS3::updateCommonWithService. Can't open for output: \"$common_path\"\n";
+  print OUT $_;
+  close(OUT);
+  system("chmod +x $common_path");
+  $/=$save_delim;
+}

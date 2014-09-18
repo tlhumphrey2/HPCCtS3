@@ -1,0 +1,33 @@
+#!/bin/bash -e
+# config-changed occurs everytime a new configuration value is updated (juju set)
+juju-log "Entering config-changed"
+
+. ${CHARM_DIR}/hooks/hpcc-common
+
+##
+## Check if need to generate environment.xml
+##
+
+envgen_signature=$(config-get envgen-signature)
+juju-log "In config-changed. envgen_signature: $envgen_signature"
+[ -z "${envgen_signature}" ] && juju-log "Leaving config-changed. envgen_signature is NULL." && exit 0
+
+SIGNATURE_FILE=${JUJU_HPCC_DIR}/env_signature.txt
+if [ -e ${SIGNATURE_FILE} ]
+then
+    saved_signature=$(head -n 1 $SIGNATURE_FILE)
+    juju-log "saved_signature: $saved_signature"
+    [ "$saved_signature" == "$envgen_signature" ] && juju-log "Leaving config-changed. saved_signature ($saved_signature) == envgen_signature is NULL." && exit 0
+fi
+
+[ ! -e $IP_FILE ] && juju-log "Leaving config-changed. IP_FILE ($IP_FILE) DOES NOT EXIST." && exit 0
+
+get_envgen_configuration
+
+composed_signature="${support_nodes}-${roxie_nodes}-${thor_nodes}-${slaves_per_node}"
+juju-log "composed_signature: $composed_signature"
+[ "$composed_signature" != "$envgen_signature" ] && juju-log "Leaving config-changed. composed_signature ($composed_signature) NOT EQUAL envgen_signature." && exit 0
+
+
+configure_cluster
+juju-log "Leaving config-changed"
