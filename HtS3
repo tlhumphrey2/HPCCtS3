@@ -43,6 +43,8 @@ $service = $opt_service || 'tlh-hpcc';
 #=================================================================
 print "Have all inputted arguments.\n";
 
+system("juju switch amazon");
+
 local $opt_goto;
 if ( scalar(@ARGV) > 0 ){
    $opt_goto = shift @ARGV;
