@@ -248,10 +248,11 @@ exit;
 #  END COPY FILES TO S3
 #----------------------------------------------
 
-wait_cp2s3:
+cp2s3_done:
 
 get_thor_info();
 loopUntilAllFilesCopiedToS3($service);
+exit;
 
 destroy:
 destroy_environment:
