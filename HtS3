@@ -231,8 +231,8 @@ get_thor_info();
 print "\nDoing cp2s3\n\n";
 
 print "First, remove anything currently in S3 buckets.\n";
-print("cd /home/user/hpcc-20140819;./rmS3Buckets.pl\n");
-system("cd /home/user/hpcc-20140819;./rmS3Buckets.pl");
+print("cd $home/HPCCtS3;./rmS3Buckets.pl\n");
+system("cd $home/HPCCtS3;./rmS3Buckets.pl");
 
 foreach my $u (@unit_numbers){
   print "\nCopy from unit=$u.\n";
