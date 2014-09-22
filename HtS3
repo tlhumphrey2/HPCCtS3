@@ -69,7 +69,7 @@ bootstrap:
 # If $thor_info_pl file exists, delete it.
 system("rm -f $thor_info_pl") if -e $thor_info_pl;
 
-restore:
+restore_hpcc:
 
 if ( $opt_goto eq 'restore' ){
    print("restore\n");
