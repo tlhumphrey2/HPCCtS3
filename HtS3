@@ -212,10 +212,7 @@ loopUntilAllFilesCopiedFromS3($service);
 exit if $opt_goto eq 'iscpfs3';
 
 local $_=`juju ssh ${service}/$esp_unit_number /var/lib/juju/agents/unit-${service}-$esp_unit_number/charm/hooks/RestoreLogicalFiles.pl`;
-#local $restore_error_log = "/home/user/${service}_restore.log";
-#open(OUT,">$restore_error_log") || die "Can't open for output \"$restore_error_log\"\n";
-#print OUT "$_\n";
-#close(OUT);
+loopUntilAllLogicalFilesRestored($service);
 
 exit;
 #----------------------------------------------
@@ -346,6 +343,25 @@ my ( $service, @units )=@_;
 
 @units = @not_copied_units;
 return @units;
+}
+#----------------------------------------------------
+# call: loopUntilAllLogicalFilesRestored($service);
+sub loopUntilAllLogicalFilesRestored{
+my ( $service )=@_;
+
+   my $AllLogicalFilesAreRestored=0;
+   while( $AllLogicalFilesAreRestored==0 ){
+      $_=`juju ssh ${service}/$esp_unit_number /var/lib/juju/agents/unit-${service}-$esp_unit_number/charm/hooks/isLogicalFilesRestored.sh 2> /dev/null`;
+      if ( ! /Done restoring logical files/ ){
+         print "Logical files are not restored. Please wait....\n";
+         sleep(5);
+      }
+      else{
+         $AllLogicalFilesAreRestored=1;
+      }
+   }
+
+print "All Logical Files Are Restored.\n";
 }
 #----------------------------------------------------
 # call: loopUntilAllFilesCopiedFromS3($service);
