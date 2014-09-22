@@ -8,6 +8,7 @@ $cpfs3_logname = "$HomePath/tlh_hpcc_cpFilesFromS3.log";
 $cpfs3_DoneAlertFile = "$HomePath/done_cpFilesFromS3";
 $cp2s3_logname = "$HomePath/tlh_hpcc_cpFiles2S3.log";
 $cp2s3_DoneAlertFile = "$HomePath/done_cpFiles2S3";
+$AlertDoneRestoringLogicalFiles = "$HomePath/done_restoring_logical_files";
 
 $MetadataFolder='/home/ubuntu/metadata';
 
