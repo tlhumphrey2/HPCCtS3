@@ -224,6 +224,7 @@ get_thor_info();
 loopUntilAllFilesCopiedFromS3($service);
 exit if $opt_goto eq 'iscpfs3';
 
+print "Make sure all logical files have been restored.\n";
 local $_=`juju ssh ${service}/$esp_unit_number /var/lib/juju/agents/unit-${service}-$esp_unit_number/charm/hooks/RestoreLogicalFiles.pl`;
 loopUntilAllLogicalFilesRestored($service);
 
