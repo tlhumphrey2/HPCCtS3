@@ -69,6 +69,19 @@ bootstrap:
 # If $thor_info_pl file exists, delete it.
 system("rm -f $thor_info_pl") if -e $thor_info_pl;
 
+restore:
+
+if ( $opt_goto eq 'restore' ){
+   print("restore\n");
+   if ( -e $thor_info_pl ){
+      require "$thor_info_pl";
+      system("rm -f $thor_info_pl");
+   }
+   else{
+     print "WARNING: Previously deployed HPCC's configuration has been deleted.\n   If current nodes=\"$nodes\" is not the same as the previously deployed HPCC's THOR then restoration may not work.\n";
+   }
+}
+
 $_=`juju status 2> /dev/null`;
 if ( /agent-state/ ){
   print("juju destroy-environment amazon\n");
@@ -259,8 +272,6 @@ print "destroy\n";
 #----------------------------------------------
 #   DESTROY ENVIRONMENT
 #----------------------------------------------
-print("rm -f $thor_info_pl\n");
-system("rm -f $thor_info_pl");
 print("juju destroy-environment amazon\n");
 system("juju destroy-environment amazon");
 exit;
