@@ -38,4 +38,5 @@ foreach my $mfile (@metadatafile){
 
 }
 
+system("echo \"done\" > $AlertDoneRestoringLogicalFiles");
 printLog($cpfs3_logname,"In RestoreLogicalFiles.pl. Completed logical file restoration.\n");
