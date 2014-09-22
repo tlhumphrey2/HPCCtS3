@@ -219,13 +219,13 @@ print "restore\n";
 iscpfs3:
 print "iscpfs3\n" if $opt_goto eq 'iscpfs3';
 
-print "Make sure all files have been copied before attempting RestoreLogicalFiles.\n";
+print "Make sure all file parts have been copied before attempting RestoreLogicalFiles.\n";
 get_thor_info();
 loopUntilAllFilesCopiedFromS3($service);
 exit if $opt_goto eq 'iscpfs3';
 
 print "Make sure all logical files have been restored.\n";
-local $_=`juju ssh ${service}/$esp_unit_number /var/lib/juju/agents/unit-${service}-$esp_unit_number/charm/hooks/RestoreLogicalFiles.pl`;
+local $_=`juju ssh ${service}/$esp_unit_number /var/lib/juju/agents/unit-${service}-$esp_unit_number/charm/hooks/RestoreLogicalFiles.pl&`;
 loopUntilAllLogicalFilesRestored($service);
 
 exit;
@@ -316,9 +316,9 @@ get_thor_info0:
      print OUT "\$service=\"$service\";\n";
      print OUT "\$nodes=$nodes;\n";
      print OUT "\$esp_unit_id=\"$esp_unit_id\";\n";
+     print OUT "\$esp_unit_number=$esp_unit_number;\n";
      print OUT "\$esp_private_ip=\"$esp_private_ip\";\n";
      print OUT "\$esp_public_ip=\"$esp_public_ip\";\n";
-     print OUT "\$esp_unit_number=$esp_unit_number;\n";
      for(my $i=0; $i < scalar(@unit_numbers); $i++){
         print OUT "\$unit_numbers\[$i\]=$unit_numbers[$i];\n";
      }
