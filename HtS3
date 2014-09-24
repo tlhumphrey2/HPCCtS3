@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 =pod
-./HtS3 -nodes 10 -service jack-in-box deploy
+./HtS3 -nodes 10 -instance m1.small
 ./HtS3 -nodes 3
 ./HtS3 -nodes 10
 =cut
@@ -18,7 +18,7 @@ print "Just before gettng arguments.\n";
 #================== Get Arguments ================================
 require "$pdir/newgetopt.pl";
 if ( ! &NGetOpt(
-                "nodes=s", "service=s"
+                "nodes=s", "service=s","instance=s"
                 ))      # Add Options as necessary
 {
   print STDERR "\n[$0] -- ERROR -- Invalid/Missing options...\n\n";
@@ -38,8 +38,9 @@ else{
       $nodes=$opt_nodes;
 }
 print "nodes=\"$nodes\"\n";
-local @unit_numbers = 0 .. ($nodes-1);
+@unit_numbers = 0 .. ($nodes-1);
 $service = $opt_service || 'tlh-hpcc';
+$instance_type = $opt_instance || 'm3.large';
 #=================================================================
 print "Have all inputted arguments.\n";
 
@@ -62,6 +63,7 @@ else{
 
 boot:
 bootstrap:
+boot_only:
 #----------------------------------------------
 #   BOOTSTRAP
 #----------------------------------------------
@@ -102,6 +104,7 @@ while ( ! /started/is ){
 }
 
 sleep(5);
+exit if $opt_goto eq 'boot_only';
 #----------------------------------------------
 #   END BOOTSTRAP
 #----------------------------------------------
@@ -115,11 +118,29 @@ deploy_only:
 # If $thor_info_pl file exists, delete it.
 system("rm -f $thor_info_pl") if -e $thor_info_pl;
 
+# Save what information we currently have to $thor_info_pl.
+write2thor_info_pl();
+
 # Change 'tlh-hpcc' in $hooks/common.pl to ${service}.
 updateCommonWithService($service);
 
-print("juju deploy --constraints=\"instance-type=m3.large\" --repository=. local:precise/hpcc ${service} -n $nodes\n");
-system("cd $home/HPCCtS3/juju-charms;juju deploy --constraints=\"instance-type=m3.large\" --repository=. local:precise/hpcc ${service} -n $nodes");
+if ( ($instance_type=~/^\s*$/) || ($service=~/^\s*$/) || ($nodes=~/^\s*$/) ){
+   my $missing_parameters='';
+   if ($instance_type=~/^\s*$/){
+     $missing_parameters .= ", instance_type";
+   }
+   if ($service=~/^\s*$/){
+     $missing_parameters .= ", service";
+   }
+   if ($nodes=~/^\s*$/){
+     $missing_parameters .= ", nodes";
+   }
+   $missing_parameters =~ s/^, //;
+   die "FATAL ERROR: Cannot perform a 'juju deploy' because needed parameters are missing: $missing_parameters.\n";
+}
+
+print("juju deploy --constraints=\"instance-type=$instance_type\" --repository=. local:precise/hpcc ${service} -n $nodes\n");
+system("cd $home/HPCCtS3/juju-charms;juju deploy --constraints=\"instance-type=$instance_type\" --repository=. local:precise/hpcc ${service} -n $nodes");
 sleep(1);
 $_=`./juju-status.pl $service`;
 print $_;
@@ -159,7 +180,7 @@ sleep(20);
 thor_info:
 thor_info_only:
 #----------------------------------------------
-#   ESP INFO
+#   THOR INFO
 #----------------------------------------------
 print "thor_info\n";
 get_thor_info();
@@ -189,7 +210,7 @@ if ( $opt_goto =~ /^cp2s3/ ){
 }
 exit;
 #----------------------------------------------
-#   END ESP INFO
+#   END THOR INFO
 #----------------------------------------------
 
 
@@ -279,6 +300,33 @@ exit;
 #----------------------------------------------------
 # SUBROUTINES
 #----------------------------------------------------
+sub write2thor_info_pl{
+     my $open_expr = ( -e $thor_info_pl )? ">>$thor_info_pl" : ">$thor_info_pl";
+     open(OUT,$open_expr) || die "Can't open for output: \"$thor_info_pl\"\n";
+     print OUT "\$home=\"$home\";\n" if $home !~ /^\s*$/;
+     print OUT "\$service=\"$service\";\n" if $service !~ /^\s*$/;
+     print OUT "\$nodes=$nodes;\n" if $nodes !~ /^\s*$/;
+     print OUT "\$instance_type=\"$instance_type\";\n" if $instance_type !~ /^\s*$/;
+     print OUT "\$esp_unit_id=\"$esp_unit_id\";\n" if $esp_unit_id !~ /^\s*$/;
+     print OUT "\$esp_unit_number=$esp_unit_number;\n" if $esp_unit_number !~ /^\s*$/;
+     print OUT "\$esp_private_ip=\"$esp_private_ip\";\n" if $esp_private_ip !~ /^\s*$/;
+     print OUT "\$esp_public_ip=\"$esp_public_ip\";\n" if $esp_public_ip !~ /^\s*$/;
+     
+     if ( scalar(@unit_numbers) > 0 ){
+       for(my $i=0; $i < scalar(@unit_numbers); $i++){
+          print OUT "\$unit_numbers\[$i\]=$unit_numbers[$i];\n";
+       }
+     }
+     
+     if ( scalar(@slave_unit_numbers) > 0 ){
+       for(my $i=0; $i < scalar(@slave_unit_numbers); $i++){
+          print OUT "\$slave_unit_numbers\[$i\]=$slave_unit_numbers[$i];\n";
+       }
+     }
+     print OUT "1;\n";
+     close(OUT);
+}
+#----------------------------------------------------
 sub get_thor_info{
   
   if ( -e $thor_info_pl ){
@@ -286,7 +334,8 @@ sub get_thor_info{
      require $thor_info_pl;
      print "\n\nesp_unit_id=\"$esp_unit_id\", esp_unit_number=\"$esp_unit_number\", esp_private_ip=\"$esp_private_ip\", esp_public_ip=\"$esp_public_ip\"\n";
      print "\@slave_unit_numbers=(",join(",",@slave_unit_numbers),")\n";
-     return;
+     
+     return if $esp_unit_id !~ /^\s*$/;
   }
   
 get_thor_info0:  
@@ -311,22 +360,7 @@ get_thor_info0:
      print "\n\nesp_unit_id=\"$esp_unit_id\", esp_unit_number=\"$esp_unit_number\", esp_private_ip=\"$esp_private_ip\", esp_public_ip=\"$esp_public_ip\"\n";
      print "\@slave_unit_numbers=(",join(",",@slave_unit_numbers),")\n";
      print "Store esp info in \"$thor_info_pl\"\n";
-     open(OUT,">$thor_info_pl") || die "Can't open for output: \"$thor_info_pl\"\n";
-     print OUT "\$home=\"$home\";\n";
-     print OUT "\$service=\"$service\";\n";
-     print OUT "\$nodes=$nodes;\n";
-     print OUT "\$esp_unit_id=\"$esp_unit_id\";\n";
-     print OUT "\$esp_unit_number=$esp_unit_number;\n";
-     print OUT "\$esp_private_ip=\"$esp_private_ip\";\n";
-     print OUT "\$esp_public_ip=\"$esp_public_ip\";\n";
-     for(my $i=0; $i < scalar(@unit_numbers); $i++){
-        print OUT "\$unit_numbers\[$i\]=$unit_numbers[$i];\n";
-     }
-     for(my $i=0; $i < scalar(@slave_unit_numbers); $i++){
-        print OUT "\$slave_unit_numbers\[$i\]=$slave_unit_numbers[$i];\n";
-     }
-     print OUT "1;\n";
-     close(OUT);
+     write2thor_info_pl();
   }
   else{
      print "\nERROR: Cannot parse esp_id_info and extract esp id, private and public ips.\n";
