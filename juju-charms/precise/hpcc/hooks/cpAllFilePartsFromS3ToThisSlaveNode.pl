@@ -26,8 +26,8 @@ if ( `cat /tmp/bucket_exists.txt` =~ /not exist/i ){
    exit 0;
 }
 
-# Copy all file part on $s3bucket/thor/$thor_slave_number/* into /var/lib/HPCCSystems/hpcc-data/thor
-cpAllFilePartsOnS3('/var/lib/HPCCSystems/hpcc-data/thor',"$s3bucket/thor");
+# Copy all file part on $s3bucket/thor/$thor_slave_number/* into $FilePartsFolder
+cpAllFilePartsOnS3($FilePartsFolder,"$s3bucket/thor");
 
 # Let everyone know this node has completed copying file parts from S3 to node.
 system("echo \"done\" > $cpfs3_DoneAlertFile");

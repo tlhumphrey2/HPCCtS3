@@ -19,7 +19,7 @@ if ( `cat /tmp/bucket_exists.txt` =~ /not exist/i ){
 }
 
 #Copy all S3 files of dropzone into mydropzone.
-system("mkdir /var/lib/HPCCSystems/mydropzone") if ! -e "/var/lib/HPCCSystems/mydropzone";
-system("cd /var/lib/HPCCSystems/mydropzone;sudo s3cmd $cfg get $s3bucket/lz/* > /dev/null 2> /dev/null");
+system("mkdir $DropzoneFolder") if ! -e $DropzoneFolder;
+system("cd $DropzoneFolder;sudo s3cmd $cfg get $s3bucket/lz/* > /dev/null 2> /dev/null");
 
 printLog($cpfs3_logname,"In cpLZFilesFromS3ToMaster.pl. Completed copying from S3 all LZ files.\n");

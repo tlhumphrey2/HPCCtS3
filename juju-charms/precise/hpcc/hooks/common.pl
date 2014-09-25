@@ -1,28 +1,34 @@
 #!/usr/bin/perl
-$service='tlh-hpcc';
 $HomePath="/home/ubuntu";
 
-$FilePartsFolder="/var/lib/HPCCSystems/hpcc-data/thor";
-
+#Log and Alert files
 $cpfs3_logname = "$HomePath/tlh_hpcc_cpFilesFromS3.log";
 $cpfs3_DoneAlertFile = "$HomePath/done_cpFilesFromS3";
 $cp2s3_logname = "$HomePath/tlh_hpcc_cpFiles2S3.log";
 $cp2s3_DoneAlertFile = "$HomePath/done_cpFiles2S3";
 $AlertDoneRestoringLogicalFiles = "$HomePath/done_restoring_logical_files";
 
+#HPCC System folders
+$FilePartsFolder='/var/lib/HPCCSystems/hpcc-data/thor';
+$DropzoneFolder='/var/lib/HPCCSystems/mydropzone';
+
+#Metadata folder
 $MetadataFolder='/home/ubuntu/metadata';
 
 $dfuplus='/opt/HPCCSystems/bin/dfuplus';
 
-$jujutools='/var/lib/juju/tools';
-$jujulogpath=$jujutools.'/'.`ls -l $jujutools|egrep "^d"|sed "s/^.........................................//"`;
-
-# Get hpcc juju unit number
+# Get hpcc service name and juju unit number
+my $service_re = '[a-zA-Z][\w\-]*';
 $_=`ls -l /var/log/juju/*`;
+$service = $1 if /unit-($service_re)-\d+.log/;
 $juju_unit_number = $1 if /unit-${service}-(\d+).log/;
-
 $juju_ip_file='/var/lib/HPCCSystems/charm/ip_file.txt';
 
+#Template for hooks folder
+$hooks_template="/var/lib/juju/agents/unit-<service>-<juju_unit_number>/charm/hooks";
+
+#===================== Subroutines/Functions =======================================
+#-----------------------------------------------------------------------------------
 sub openLog{
 my ( $logname )=@_;
 
@@ -34,7 +40,7 @@ my ( $logname )=@_;
         open(LOG,">>$logname") || die "Can't open for output \"$logname\"\n";
      }
 }
-
+#-----------------------------------------------------------------------------------
 sub printLog{
 my ( $logname, $text2print )=@_;
   print LOG $text2print;
@@ -52,7 +58,7 @@ sub thor_nodes_ips{
   }
 return ($master_pip, @slave_pip);
 }
-
+#-----------------------------------------------------------------------------------
 sub get_this_nodes_private_ip{
 my ($logname)=@_;
   # Get the private ip address of this slave node 
@@ -71,7 +77,7 @@ my ($logname)=@_;
   }
 return $ThisNodesPip;
 }
-
+#-----------------------------------------------------------------------------------
 sub get_thor_slave_number{
 my ($ThisSlaveNodesPip,$slave_pip_ref)=@_;
 my @slave_pip = @$slave_pip_ref;
@@ -95,11 +101,14 @@ my @slave_pip = @$slave_pip_ref;
   }
 return $thor_slave_number;
 }
-
+#-----------------------------------------------------------------------------------
 sub get_s3cmd_config{
 my ( $juju_unit_number )=@_;
 # Setup s3cmd configuration file if it exists.
-my $cfg = ( -e "/var/lib/juju/agents/unit-${service}-$juju_unit_number/charm/hooks/.s3cfg" )? "--config=/var/lib/juju/agents/unit-${service}-$juju_unit_number/charm/hooks/.s3cfg" : '';
+my $hooks=$hooks_template;
+$hooks =~ s/<service>/$service/;
+$hooks =~ s/<juju_unit_number>/$juju_unit_number/;
+my $cfg = ( -e "$hooks/.s3cfg" )? "--config=$hooks/.s3cfg" : '';
 
 printLog($cpfs3_logname,"In get_s3cmd_config. cfg=\"$cfg\"\n");
 
@@ -110,18 +119,18 @@ if ( $cfg eq '' ){
 
 return $cfg;
 }
-
+#-----------------------------------------------------------------------------------
 sub FilesOnThor{
 my ( $master_pip )=@_;
   # Get list of files on thor
-  my @file=split(/\n/,`/opt/HPCCSystems/bin/dfuplus server=$master_pip action=list name=*`);
+  my @file=split(/\n/,`$dfuplus server=$master_pip action=list name=*`);
   shift @file;
   if ( scalar(@file)==0 ){
      printLog($cp2s3_logname,"In isFilesOnThor. There are no files on this thor.\n");
   }
 return @file;
 }
-
+#-----------------------------------------------------------------------------------
 sub cpAllFilePartsOnS3{
 my ( $thor_folder, $s3folder )=@_;
    printLog($cpfs3_logname,"DEBUG: Entering cpAllFilePartsOnS3. thor_folder=\"$thor_folder\", s3folder=\"$s3folder\"\n");

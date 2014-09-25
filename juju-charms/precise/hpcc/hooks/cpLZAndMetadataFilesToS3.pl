@@ -22,7 +22,7 @@ if ( scalar(@FilesOnThor)==0 ){
 }
 
 # check for files on dropzone
-system("ls -l /var/lib/HPCCSystems/mydropzone > /tmp/dropzone-files.txt");
+system("ls -l $DropzoneFolder > /tmp/dropzone-files.txt");
 $FilesOnDropzone=1;
 if ( `cat /tmp/dropzone-files.txt` =~ /\btotal\s+0\b/is ){
    $FilesOnDropzone=0;
@@ -64,8 +64,8 @@ if (scalar(@FilesOnThor) > 0 ){
 
 if ( $FilesOnDropzone ){
   #Copy all files on dropzone into S3.
-  printLog($cp2s3_logname,"DEBUG: sudo s3cmd $cfg put --recursive /var/lib/HPCCSystems/mydropzone/* $s3bucket/lz/\n");
-  system("sudo s3cmd $cfg put --recursive /var/lib/HPCCSystems/mydropzone/* $s3bucket/lz/ > /dev/null 2> /dev/null");
+  printLog($cp2s3_logname,"DEBUG: sudo s3cmd $cfg put --recursive $DropzoneFolder/* $s3bucket/lz/\n");
+  system("sudo s3cmd $cfg put --recursive $DropzoneFolder/* $s3bucket/lz/ > /dev/null 2> /dev/null");
 }
 
 system("echo \"done\" > $cp2s3_DoneAlertFile");

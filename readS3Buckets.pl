@@ -18,9 +18,7 @@ my ( $s3folder )=@_;
       #  are no more sub-directories.
       if ( s/^\s*DIR\s*// ){
          s/\/\s*$//;
-#print "DEBUG: In readContentsOfS3Bucket. \$_=\"$_\"\n";
          my $subfolder = $1 if /\/([^\/]+)\s*$/;
-#print "DEBUG: In readContentsOfS3Bucket. subfolder=\"$subfolder\"\n";
          
          #print "DEBUG: In readContentsOfS3Bucket. Calling readContentsOfS3Bucket(\"$_\");\n";
          readContentsOfS3Bucket($_);
@@ -36,7 +34,6 @@ my ( $s3folder )=@_;
    if ( ! $FoundFiles ){
       print "NO FILES in $s3folder.\n";
    }
-   #print "DEBUG: Leaving readContentsOfS3Bucket\n";
 }
 
 sub getAllHPCCS3Buckets{
