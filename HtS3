@@ -73,8 +73,8 @@ system("rm -f $thor_info_pl") if -e $thor_info_pl;
 
 restore_hpcc:
 
-if ( $opt_goto eq 'restore' ){
-   print("restore\n");
+if ( $opt_goto eq 'restore_hpcc' ){
+   print("restore_hpcc\n");
    if ( -e $thor_info_pl ){
       require "$thor_info_pl";
       system("rm -f $thor_info_pl");
