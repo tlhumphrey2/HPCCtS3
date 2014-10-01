@@ -2,7 +2,7 @@
 
 # Ran ONLY on master (esp)
 
-$thisDir = ( $0 =~ /^(.+)\// )? $1 : '';
+$thisDir = ( $0 =~ /^(.+)\// )? $1 : '.';
 
 require "$thisDir/common.pl";
 
@@ -37,7 +37,7 @@ if ( `cat /tmp/bucket_exists.txt` =~ /not exist/i ){
    system("sudo s3cmd $cfg mb $s3bucket");
 }
 else{
-   printLog($cp2s3_logname,"In cpLZAndMetadataFilesToS3.pl. s3 bucket, tlh_hpcc_backup, already EXISTS\nSo, we do not need to create it.\n");
+   printLog($cp2s3_logname,"In cpLZAndMetadataFilesToS3.pl. WARNING. s3 bucket, $s3bucket, already EXISTS\nSo, we do not need to create it.\n");
 }
 
 #-------------------------------------------------------------------------------

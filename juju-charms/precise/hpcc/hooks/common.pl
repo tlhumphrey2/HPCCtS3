@@ -45,7 +45,7 @@ sub printLog{
 my ( $logname, $text2print )=@_;
   print LOG $text2print;
 }
-
+#-----------------------------------------------------------------------------------
 sub thor_nodes_ips{
   # Gets a list of private ip addresses for all slave nodes that is ordered 
   #  such that the 1st slave node is 1st, the 2nd slave node is 2nd, etc.
@@ -53,6 +53,7 @@ sub thor_nodes_ips{
   $master_pip=shift @slave_pip;
   $master_pip=~s/;//;
   for( my $i=0; $i < scalar(@slave_pip); $i++){
+     $slave_pip[$i] =~ s/;//;
      my $slave_number=$i+1;
      printLog($cpfs3_logname,"In thor_nodes_ips. slave_pip\[$slave_number\]=\"$slave_pip[$i]\n");
   }

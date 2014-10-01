@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # name: cpLZAndMetadataFilesFromS3ToMaster.pl
 
-$thisDir = ( $0 =~ /^(.+)\// )? $1 : '';
+$thisDir = ( $0 =~ /^(.+)\// )? $1 : '.';
 
 require "$thisDir/common.pl";
 
@@ -16,3 +16,4 @@ system("perl $thisDir/cpMetadataFilesFromS3ToNode.pl");
 
 system("echo \"done\" > $cpfs3_DoneAlertFile");
 printLog($cpfs3_logname,"In cpLZAndMetadataFilesFromS3ToMaster.pl. All copies from S3 completed.\n");
+

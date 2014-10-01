@@ -118,6 +118,12 @@ deploy_only:
 # If $thor_info_pl file exists, delete it.
 system("rm -f $thor_info_pl") if -e $thor_info_pl;
 
+# Make sure variables that should be blank are:
+$esp_unit_id='';
+$esp_unit_number='';
+$esp_private_ip='';
+$esp_public_ip='';
+
 # Save what information we currently have to $thor_info_pl.
 write2thor_info_pl();
 

@@ -2,7 +2,7 @@
 
 #NOTE: This code is ran on master (esp) ONLY.
 
-$thisDir = ( $0 =~ /^(.+)\// )? $1 : '';
+$thisDir = ( $0 =~ /^(.+)\// )? $1 : '.';
 
 require "$thisDir/common.pl";
 
@@ -24,6 +24,7 @@ printLog($cp2s3_logname,"In cpAllFilePartsToS3.pl. s3bucket=\"$s3bucket\"\n");
 @FilesOnThor = FilesOnThor($master_pip);
 if ( scalar(@FilesOnThor)==0 ){
    printLog($cp2s3_logname,"In cpAllFilePartsToS3. There are no files on the thor.\nSo EXITing.");
+   system("echo \"done\" > $cp2s3_DoneAlertFile");
    exit 0;
 }
 
@@ -35,7 +36,7 @@ if ( `cat /tmp/bucket_exists.txt` =~ /not exist/i ){
    system("sudo s3cmd $cfg mb $s3bucket");
 }
 else{
-   printLog($cp2s3_logname,"In cpAllFilePartsToS3.pl. s3 bucket, tlh_hpcc_backup, already EXISTS\nSo, we do not need to create it.\n");
+   printLog($cp2s3_logname,"In cpAllFilePartsToS3.pl. s3 bucket, $s3bucket, already EXISTS\nSo, we do not need to create it.\n");
 }
 
 if ( scalar(@FilesOnThor)>0 ){

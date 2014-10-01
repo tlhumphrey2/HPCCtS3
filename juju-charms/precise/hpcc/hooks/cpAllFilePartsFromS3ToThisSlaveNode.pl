@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-$thisDir = ( $0 =~ /^(.+)\// )? $1 : '';
+$thisDir = ( $0 =~ /^(.+)\// )? $1 : '.';
 
 require "$thisDir/common.pl";
 
@@ -23,6 +23,7 @@ $cfg=get_s3cmd_config($juju_unit_number);
 system("sudo s3cmd $cfg ls $s3bucket 2> /tmp/bucket_exists.txt");
 if ( `cat /tmp/bucket_exists.txt` =~ /not exist/i ){
    printLog($cpfs3_logname,"In cpAllFilePartsFromS3ToThisSlaveNode.pl. WARNING. The s3 bucket, tlh_hpcc_backup, DOES NOT EXISTS. EXITing.\n");
+   system("echo \"done\" > $cpfs3_DoneAlertFile");
    exit 0;
 }
 

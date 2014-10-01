@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-$thisDir = ( $0 =~ /^(.+)\// )? $1 : '';
+$thisDir = ( $0 =~ /^(.+)\// )? $1 : '.';
 
 require "$thisDir/common.pl";
 

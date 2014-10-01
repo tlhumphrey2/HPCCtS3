@@ -44,11 +44,18 @@ sub getAllHPCCS3Buckets{
   return grep(s/^.+s3:/s3:/,@b);
 }
 
-@S3BucketsToRemove = (scalar(@ARGV)==0)? getAllHPCCS3Buckets() : @ARGV;
-foreach (@S3BucketsToRemove){
+@S3BucketsToRead = (scalar(@ARGV)==0)? getAllHPCCS3Buckets() : @ARGV;
+
+if ( scalar(@S3BucketsToRead) == 0 ){
+  print "There are no S3 buckets.\n";
+  exit;
+}
+
+foreach (@S3BucketsToRead){
    local $s3bucket=$_;
    local $FoundFiles=0;
    print "Read $_\n";
    readContentsOfS3Bucket($_);
    print "\n";
 }
+
