@@ -22,8 +22,6 @@ if ( `cat /tmp/bucket_exists.txt` =~ /not exist/i ){
 system("mkdir $MetadataFolder") if ! -e "$MetadataFolder";
 system("cd $MetadataFolder;sudo s3cmd $cfg get $s3bucket/metadata/* 2> /dev/null > /dev/null");
 
-($master_pip, @slave_pip)=thor_nodes_ips();
-
 #-------------------------------------------------------------------------------------------------------------
 # Change private ips in each file's metadata to the private ips of the current slaves.
 #-------------------------------------------------------------------------------------------------------------
@@ -43,6 +41,9 @@ else
 }
 
 undef $/;
+
+@slave_pip = get_ordered_thor_slave_ips();
+
 $comma_separated_slave_ips=join(",",@slave_pip);
 foreach my $mfile (@metadatafile){
    printLog($cpfs3_logname,"DEBUG: In cpMetadataFilesFromS3ToNode.pl. Open metadata file: $mfile.\n");

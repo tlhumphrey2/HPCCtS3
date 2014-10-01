@@ -11,6 +11,7 @@ $AlertDoneRestoringLogicalFiles = "$HomePath/done_restoring_logical_files";
 #HPCC System folders
 $FilePartsFolder='/var/lib/HPCCSystems/hpcc-data/thor';
 $DropzoneFolder='/var/lib/HPCCSystems/mydropzone';
+$SlaveNodesFile='/var/lib/HPCCSystems/mythor/slaves';     # This file must be on master
 
 #Metadata folder
 $MetadataFolder='/home/ubuntu/metadata';
@@ -57,7 +58,13 @@ sub thor_nodes_ips{
      my $slave_number=$i+1;
      printLog($cpfs3_logname,"In thor_nodes_ips. slave_pip\[$slave_number\]=\"$slave_pip[$i]\n");
   }
-return ($master_pip, @slave_pip);
+return ($master_pip, reverse @slave_pip);
+}
+#-----------------------------------------------------------------------------------
+# This can only be used on the master node
+sub get_ordered_thor_slave_ips{
+  @slave_pip=split(/\n/,`cat $SlaveNodesFile|egrep "[0-9]"`);
+return @slave_pip;
 }
 #-----------------------------------------------------------------------------------
 sub get_this_nodes_private_ip{
@@ -74,7 +81,6 @@ my ($logname)=@_;
   }
   else{
      printLog($logname,"In get_this_nodes_private_ip. Could not file ThisNodesPip in ifconfig's output. EXITing\n");
-     exit 1;
   }
 return $ThisNodesPip;
 }
@@ -82,13 +88,14 @@ return $ThisNodesPip;
 sub get_thor_slave_number{
 my ($ThisSlaveNodesPip,$slave_pip_ref)=@_;
 my @slave_pip = @$slave_pip_ref;
+
   # Find the private ip address of @slave_pip that matches this
   #  slave node's ip address. When found index, where index begins with 1, into @all_slave_nod_ips will
   #     be $ThisSlaveNodeId.
   my $thor_slave_number='';
   my $FoundThisSlaveNodeId=0;
   for( my $i=0; $i < scalar(@slave_pip); $i++){
-     if ( $slave_pip[$i] eq "$ThisSlaveNodesPip;" ){
+     if ( $slave_pip[$i] eq $ThisSlaveNodesPip ){
         $thor_slave_number=$i+1;
         printLog($cpfs3_logname,"In get_thor_slave_number. thor_slave_number=\"$thor_slave_number\"\n");
         $FoundThisSlaveNodeId=1;
@@ -98,7 +105,6 @@ my @slave_pip = @$slave_pip_ref;
  
   if ( $FoundThisSlaveNodeId==0 ){
       printLog($cpfs3_logname,"Could not find thor slave number for this slave ($ThisSlaveNodesPip). EXITING without copying file parts to S3.\n");
-      exit 1;
   }
 return $thor_slave_number;
 }

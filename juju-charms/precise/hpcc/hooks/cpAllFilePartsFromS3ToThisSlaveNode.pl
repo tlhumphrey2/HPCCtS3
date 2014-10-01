@@ -13,6 +13,7 @@ printLog($cp2s3_logname,"In cpAllFilePartsFromS3ToThisSlaveNode.pl. master_pip=\
 $ThisSlaveNodesPip = get_this_nodes_private_ip();
 
 $thor_slave_number = get_thor_slave_number($ThisSlaveNodesPip,\@slave_pip);
+printLog($cpfs3_logname,"In cpAllFilePartsFromS3ToThisSlaveNode.pl. ThisSlaveNodesPip=\"$ThisSlaveNodesPip\", thor_slave_number=\"$thor_slave_number\"\n");
 
 $s3bucket = "s3://tlh_hpcc_${thor_slave_number}_backup";
 printLog($cpfs3_logname,"In cpAllFilePartsFromS3ToThisSlaveNode.pl. s3bucket=\"$s3bucket\"\n");
