@@ -18,7 +18,7 @@ printLog($cp2s3_logname,"In cpAllFilePartsToS3.pl. ThisSlaveNodesPip=\"$ThisSlav
 
 $thor_slave_number = get_thor_slave_number($ThisSlaveNodesPip,\@slave_pip);
 
-$s3bucket = "s3://tlh_hpcc_${thor_slave_number}_backup";
+$s3bucket = "s3://${service_name}_${thor_slave_number}_backup";
 printLog($cp2s3_logname,"In cpAllFilePartsToS3.pl. s3bucket=\"$s3bucket\"\n");
 
 @FilesOnThor = FilesOnThor($master_pip);
@@ -30,7 +30,7 @@ if ( scalar(@FilesOnThor)==0 ){
 
 $cfg=get_s3cmd_config($juju_unit_number);
 
-# If s3 bucket, tlh_hpcc_backup, does not exist, create it.
+# If s3 bucket, ${service_name}_backup, does not exist, create it.
 system("sudo s3cmd $cfg ls $s3bucket 2> /tmp/bucket_exists.txt");
 if ( `cat /tmp/bucket_exists.txt` =~ /not exist/i ){
    system("sudo s3cmd $cfg mb $s3bucket");

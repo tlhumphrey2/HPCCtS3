@@ -15,7 +15,7 @@ $ThisSlaveNodesPip = get_this_nodes_private_ip();
 $thor_slave_number = get_thor_slave_number($ThisSlaveNodesPip,\@slave_pip);
 printLog($cpfs3_logname,"In cpAllFilePartsFromS3ToThisSlaveNode.pl. ThisSlaveNodesPip=\"$ThisSlaveNodesPip\", thor_slave_number=\"$thor_slave_number\"\n");
 
-$s3bucket = "s3://tlh_hpcc_${thor_slave_number}_backup";
+$s3bucket = "s3://${service_name}_${thor_slave_number}_backup";
 printLog($cpfs3_logname,"In cpAllFilePartsFromS3ToThisSlaveNode.pl. s3bucket=\"$s3bucket\"\n");
 
 $cfg=get_s3cmd_config($juju_unit_number);
@@ -23,7 +23,7 @@ $cfg=get_s3cmd_config($juju_unit_number);
 # Make sure the s3 bucket exists. If it doesn't then print a WARNING and exit.
 system("sudo s3cmd $cfg ls $s3bucket 2> /tmp/bucket_exists.txt");
 if ( `cat /tmp/bucket_exists.txt` =~ /not exist/i ){
-   printLog($cpfs3_logname,"In cpAllFilePartsFromS3ToThisSlaveNode.pl. WARNING. The s3 bucket, tlh_hpcc_backup, DOES NOT EXISTS. EXITing.\n");
+   printLog($cpfs3_logname,"In cpAllFilePartsFromS3ToThisSlaveNode.pl. WARNING. The s3 bucket, ${service_name}_backup, DOES NOT EXISTS. EXITing.\n");
    system("echo \"done\" > $cpfs3_DoneAlertFile");
    exit 0;
 }

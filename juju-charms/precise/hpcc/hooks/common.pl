@@ -1,10 +1,17 @@
 #!/usr/bin/perl
 $HomePath="/home/ubuntu";
 
+# Get hpcc service name and juju unit number
+my $service_re = '[a-zA-Z][\w\-]*';
+$_=`ls -l /var/log/juju/*`;
+$service = $1 if /unit-($service_re)-\d+.log/;
+( $service_name = $service ) =~ s/\-/_/g;
+$juju_unit_number = $1 if /unit-${service}-(\d+).log/;
+
 #Log and Alert files
-$cpfs3_logname = "$HomePath/tlh_hpcc_cpFilesFromS3.log";
+$cpfs3_logname = "$HomePath/${service_name}_cpFilesFromS3.log";
 $cpfs3_DoneAlertFile = "$HomePath/done_cpFilesFromS3";
-$cp2s3_logname = "$HomePath/tlh_hpcc_cpFiles2S3.log";
+$cp2s3_logname = "$HomePath/${service_name}_cpFiles2S3.log";
 $cp2s3_DoneAlertFile = "$HomePath/done_cpFiles2S3";
 $AlertDoneRestoringLogicalFiles = "$HomePath/done_restoring_logical_files";
 
@@ -16,14 +23,12 @@ $SlaveNodesFile='/var/lib/HPCCSystems/mythor/slaves';     # This file must be on
 #Metadata folder
 $MetadataFolder='/home/ubuntu/metadata';
 
-$dfuplus='/opt/HPCCSystems/bin/dfuplus';
-
-# Get hpcc service name and juju unit number
-my $service_re = '[a-zA-Z][\w\-]*';
-$_=`ls -l /var/log/juju/*`;
-$service = $1 if /unit-($service_re)-\d+.log/;
-$juju_unit_number = $1 if /unit-${service}-(\d+).log/;
-$juju_ip_file='/var/lib/HPCCSystems/charm/ip_file.txt';
+# HPCCSystems paths of interest and utilities.
+$hsbin='/opt/HPCCSystems/sbin';
+$configgen="$hsbin/configgen";
+$hbin='/opt/HPCCSystems/bin';
+$dfuplus="$hbin/dfuplus";
+$daliadmin="$hbin/daliadmin";
 
 #Template for hooks folder
 $hooks_template="/var/lib/juju/agents/unit-<service>-<juju_unit_number>/charm/hooks";
@@ -48,22 +53,15 @@ my ( $logname, $text2print )=@_;
 }
 #-----------------------------------------------------------------------------------
 sub thor_nodes_ips{
-  # Gets a list of private ip addresses for all slave nodes that is ordered 
-  #  such that the 1st slave node is 1st, the 2nd slave node is 2nd, etc.
-  @slave_pip=split(/\n/,`cat $juju_ip_file|egrep "[0-9]"`);
-  $master_pip=shift @slave_pip;
-  $master_pip=~s/;//;
-  for( my $i=0; $i < scalar(@slave_pip); $i++){
-     $slave_pip[$i] =~ s/;//;
-     my $slave_number=$i+1;
-     printLog($cpfs3_logname,"In thor_nodes_ips. slave_pip\[$slave_number\]=\"$slave_pip[$i]\n");
-  }
-return ($master_pip, reverse @slave_pip);
+  my $master_pip = `$configgen -env /etc/HPCCSystems/environment.xml -listall | grep mythor`;
+  $master_pip = $1 if $master_pip =~ /(\b\d+(?:\.\d+){3}\b)/;
+  my @slave_pip=split(/\n/,`$daliadmin $master_pip dfsgroup mythor`);
+return ($master_pip, @slave_pip);
 }
 #-----------------------------------------------------------------------------------
 # This can only be used on the master node
 sub get_ordered_thor_slave_ips{
-  @slave_pip=split(/\n/,`cat $SlaveNodesFile|egrep "[0-9]"`);
+  my ($master_pip,@slave_pip) = thor_nodes_ips();
 return @slave_pip;
 }
 #-----------------------------------------------------------------------------------

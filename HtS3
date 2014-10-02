@@ -40,6 +40,7 @@ else{
 print "nodes=\"$nodes\"\n";
 @unit_numbers = 0 .. ($nodes-1);
 $service = $opt_service || 'tlh-hpcc';
+( $service_name = $service ) =~ s/\-/_/g;
 $instance_type = $opt_instance || 'm3.large';
 #=================================================================
 print "Have all inputted arguments.\n";
@@ -126,9 +127,6 @@ $esp_public_ip='';
 
 # Save what information we currently have to $thor_info_pl.
 write2thor_info_pl();
-
-# Change 'tlh-hpcc' in $hooks/common.pl to ${service}.
-updateCommonWithService($service);
 
 if ( ($instance_type=~/^\s*$/) || ($service=~/^\s*$/) || ($nodes=~/^\s*$/) ){
    my $missing_parameters='';
@@ -307,7 +305,8 @@ exit;
 # SUBROUTINES
 #----------------------------------------------------
 sub write2thor_info_pl{
-     my $open_expr = ( -e $thor_info_pl )? ">>$thor_info_pl" : ">$thor_info_pl";
+#     my $open_expr = ( -e $thor_info_pl )? ">>$thor_info_pl" : ">$thor_info_pl";
+     my $open_expr = ">$thor_info_pl";
      open(OUT,$open_expr) || die "Can't open for output: \"$thor_info_pl\"\n";
      print OUT "\$home=\"$home\";\n" if $home !~ /^\s*$/;
      print OUT "\$service=\"$service\";\n" if $service !~ /^\s*$/;
@@ -462,20 +461,4 @@ do{
 } while ( scalar(@units) != 0 );
 
 print "All Files Have Been Copied to S3.\n";
-}
-#----------------------------------------------------
-sub updateCommonWithService{
-my ( $service )=@_;
-  my $common_path="$home/HPCCtS3/juju-charms/precise/hpcc/hooks/common.pl";
-  my $save_delim=$/;
-  undef $/;
-  open(IN,$common_path) || die "In HtS3::updateCommonWithService. Can't open for input: \"$common_path\"\n";
-  local $_=<IN>;
-  close(IN);
-  s/tlh-hpcc/$service/sg;
-  open(OUT,">$common_path") || die "In HtS3::updateCommonWithService. Can't open for output: \"$common_path\"\n";
-  print OUT $_;
-  close(OUT);
-  system("chmod +x $common_path");
-  $/=$save_delim;
 }

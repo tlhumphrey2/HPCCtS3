@@ -10,7 +10,7 @@ openLog($cp2s3_logname);
 
 printLog($cp2s3_logname,"Entering cpLZAndMetadataFilesToS3.pl\n");
 
-$s3bucket = "s3://tlh_hpcc_esp_backup";
+$s3bucket = "s3://${service_name}_esp_backup";
 printLog($cp2s3_logname,"In cpLZAndMetadataFilesToS3.pl. juju_unit_number=\"$juju_unit_number\", s3bucket=\"$s3bucket\"\n");
 
 ($master_pip, @slave_pip)=thor_nodes_ips();
@@ -30,7 +30,7 @@ if ( `cat /tmp/dropzone-files.txt` =~ /\btotal\s+0\b/is ){
 
 $cfg=get_s3cmd_config($juju_unit_number);
 
-# If s3 bucket, tlh_hpcc_backup, does not exist, create it.
+# If s3 bucket, ${service_name}_backup, does not exist, create it.
 system("sudo s3cmd $cfg ls $s3bucket 2> /tmp/bucket_exists.txt");
 if ( `cat /tmp/bucket_exists.txt` =~ /not exist/i ){
    printLog($cp2s3_logname,"sudo s3cmd $cfg mb $s3bucket\n");
@@ -40,9 +40,9 @@ else{
    printLog($cp2s3_logname,"In cpLZAndMetadataFilesToS3.pl. WARNING. s3 bucket, $s3bucket, already EXISTS\nSo, we do not need to create it.\n");
 }
 
-#-------------------------------------------------------------------------------
-# Put metadata for all files on mythor out to $s3bucket
-#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------
+# Put metadata for all files on mythor out to $s3bucket. Plus, copy files of LZ to $s3bucket.
+#-------------------------------------------------------------------------------------------
 
 if (scalar(@FilesOnThor) > 0 ){
 # Make a folder for metadata files

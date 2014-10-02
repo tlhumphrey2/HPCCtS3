@@ -11,6 +11,7 @@ printLog($cpfs3_logname,"Entering cpLZAndMetadataFilesFromS3ToMaster.pl\n");
 
 printLog($cpfs3_logname,"In cpLZAndMetadataFilesFromS3ToMaster.pl. perl $thisDir/cpLZFilesFromS3ToMaster.pl\n");
 system("perl $thisDir/cpLZFilesFromS3ToMaster.pl");
+
 printLog($cpfs3_logname,"In cpLZAndMetadataFilesFromS3ToMaster.pl. perl $thisDir/cpMetadataFilesFromS3ToNode.pl\n");
 system("perl $thisDir/cpMetadataFilesFromS3ToNode.pl");
 
