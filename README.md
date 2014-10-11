@@ -9,3 +9,5 @@ HtS3 also configures and deploys and HPCC System to Amazon's AWS using the HPCC 
 
 Included in this repository is documentation, UsingHtS3.pdf, that tells in great detail how to setup and use HtS3. Also, provided in Appendix B of this documentation is a table that briefly describes all scripts in the repository.
 
+I've also added the document, UsingHPCCCharm.pdf, that tells how to use the HPCC Charm with juju charm to deploy HPCC Systems to AWS and probably others as it gets updated.
+
