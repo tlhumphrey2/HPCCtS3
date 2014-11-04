@@ -11,3 +11,5 @@ Included in this repository is documentation, UsingHtS3.pdf, that tells in great
 
 I've also added the document, UsingHPCCCharm.pdf, that tells how to use the HPCC Charm with juju charm to deploy HPCC Systems to AWS and probably others as it gets updated.
 
+2014/11/04. Added mkEnv.sh and cpEnv.sh, two bash scripts that enables one to reconfigure an HPCC System deployed to AWS. It enables one to have multiple THOR slave nodes per AWS instance.
+
