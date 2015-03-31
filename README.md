@@ -1,6 +1,8 @@
 HPCCtS3
 =======
 
+As of 2015/03/30, a new repository exists, BestHPCCoAWS, which lets you deploy a fast running HPCC on AWS. Check it out: https://github.com/tlhumphrey2/BestHPCCoAWS.
+
 HPCCtS3, HPCC tied to S3, enables deployment of HPCC to AWS and saving and restoring THOR files to/from S3 buckets.
 
 The big thing that HtS3, the main program of this repository, does is copy to/from S3 buckets, files on the THOR nodes of a deployed HPCC System. What is unique about these copies is that they are done in parallel, which makes them much faster than despraying THOR files to the landing zone and then copying to S3 buckets. This means one can deploy an HPCC system, store its files in S3 buckets, then shutdown the system so additional AWS charges aren't incurred. Then, later have HtS3 bring up another HPCC System with the files restored to it. 
