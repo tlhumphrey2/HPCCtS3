@@ -3,49 +3,46 @@ Beginner Contributor Guide
 
 This document is for those who have never contributed to our Machine Learning (ML) Project and/or never contributed to any github project.
 
-What we hope to cover, here, is everything you need to get started as a contributor. I believe the following list covers everything.
+What we hope to cover, here, is everything you need to get started as a contributor. I believe the following list covers everything. By the way, you can use the order of this list to tell you when to do what.
 
- - Get a github account (click [here](#steps) for instructions).
- - Download git onto your PC (click [here](#Steps) for instructions).
- - On github, fork the ML repository (click [here](#Steps) for instructions).
- - Make a local copy of the ML repository from your fork (click [here](#Steps) for instructions).
- - Get access to our THOR cluster for contributors or download a VMWare HPCC System (click [here](#Steps) for instructions).
- - Download ECL IDE (click [here](#Steps) for instructions).
+ - Get a github account (click [here](#get-github-account) for instructions).
+ - Download git onto your PC (click [here](#download-git) for instructions).
+ - Setup git onto your PC (click [here](#setup-git) for instructions).
+ - On github, fork the ML repository (click [here](#fork-ml-repository) for instructions).
+ - Make a local copy of the ML repository from your fork (click [here](#make-ml-repository-local-copy) for instructions).
+ - Get access to our THOR cluster for contributors or download a VMWare HPCC System (click [here](#get-access-to-thor-cluster) for instructions).
+ - Download ECL IDE (click [here](#download-ecl-ide) for instructions).
  - Configure ECL IDE so your local ML repository can be seen in ECL IDE.
- - Learn ECL (click [here](#Steps) for instructions).
- - Run some of the example ML programs (click [here](#Steps) for example).
+ - Learn ECL (click [here](#configure-ecl-ide) for instructions).
+ - Run some of the example ML programs (click [here](#run-example-ml-programs) for example).
  - Make a contribution
- - Create a pull request (click [here](#Steps) for instructions).
+ - Create a pull request (click [here](#create-pull-request) for instructions).
 
+## Get Github Account
 
-**MarkdownPad** is a full-featured Markdown editor for Windows.
+Click [here](https://github.com/join) to begin creating a github account.
 
-### Built exclusively for Markdown ###
+## Download git
 
-Enjoy first-class Markdown support with easy access to  Markdown syntax and convenient keyboard shortcuts.
+## Setup git
 
----
+This github article tells you what to do to setup git: [help.github.com/articles/set-up-git](https://help.github.com/articles/set-up-git/). 
 
-### Steps
+## Fork ML Repository
 
-Give them a try:
+This github article tells you how to fork a repository: [help.github.com/articles/fork-a-repo](https://help.github.com/articles/fork-a-repo/).
 
-- **Bold** (`Ctrl+B`) and *Italic* (`Ctrl+I`)
-- Quotes (`Ctrl+Q`)
-- Code blocks (`Ctrl+K`)
-- Headings 1, 2, 3 (`Ctrl+1`, `Ctrl+2`, `Ctrl+3`)
-- Lists (`Ctrl+U` and `Ctrl+Shift+O`)
+## Make ML Repository Local Copy
 
-### See your changes instantly with LivePreview ###
+You make a local copy of the ML repository by making a local copy of your fork. And, to do this start with Step 2 of the repository fork instructions. [help.github.com/articles/fork-a-repo](https://help.github.com/articles/fork-a-repo/).
 
-Don't guess if your [hyperlink syntax](http://markdownpad.com) is correct; LivePreview will show you exactly what your document looks like every time you press a key.
+## Get Access To THOR Cluster
 
-### Make it your own ###
+## Download ECL IDE
 
-Fonts, color schemes, layouts and stylesheets are all 100% customizable so you can turn MarkdownPad into your perfect editor.
+## Configure ECL IDE
 
-### A robust editor for advanced Markdown users ###
+## Run Example ML Programs
 
-MarkdownPad supports multiple Markdown processing engines, including standard Markdown, Markdown Extra (with Table support) and GitHub Flavored Markdown.
+## Create Pull Request
 
-With a tabbed document interface, PDF export, a built-in image uploader, session management, spell check, auto-save, syntax highlighting and a built-in CSS management interface, there's no limit to what you can do with MarkdownPad.
