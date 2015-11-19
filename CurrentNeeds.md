@@ -26,7 +26,7 @@ Enjoy first-class Markdown support with easy access to  Markdown syntax and conv
 
 ---
 
-# Steps
+### Steps
 
 Give them a try:
 
