@@ -1,52 +1,51 @@
-# Current Needs
+Beginner Contributor Guide
+==========================
 
-Currently we need:
+This document is for those who have never contributed to our Machine Learning (ML) Project and/or never contributed to any github project.
 
-1. Test ECL programs that verify the correctness of the models created by these learning algorithms:
+What we hope to cover, here, is everything you need to get started as a contributor. I believe the following list covers everything.
 
- - Decision Trees
- - Random Forest
- - SoftMax
- - Deep Learning
- - Neural Networks
-
-2. Test ECL programs that verify the execution time of the learner on large training sets.
-
-
-In the [ML.Tests.Benchmarks](https://github.com/hpcc-systems/ecl-ml/tree/master/ML/Tests/Benchmarks) folder, there are two examples of test ECL programs that verifies the correctness of the created model and two examples of test ECL programs that verifies the execution time of the learner on large training sets.
-
-- Linear\_verify_model.ecl
-- Logistic\_verify_model.ecl
-- Linear\_runtime\_on\_large\_trainingset.ecl
-- Logistic\_runtime\_on\_large\_trainingset.ecl
+ - Get a github account (click [here](#Steps) for instructions).
+ - Download git onto your PC (click [here](#Steps) for instructions).
+ - On github, fork the ML repository (click [here](#Steps) for instructions).
+ - Make a local copy of the ML repository from your fork (click [here](#Steps) for instructions).
+ - Get access to our THOR cluster for contributors or download a VMWare HPCC System (click [here](#Steps) for instructions).
+ - Download ECL IDE (click [here](#Steps) for instructions).
+ - Configure ECL IDE so your local ML repository can be seen in ECL IDE.
+ - Learn ECL (click [here](#Steps) for instructions).
+ - Run some of the example ML programs (click [here](#Steps) for example).
+ - Make a contribution
+ - Create a pull request (click [here](#Steps) for instructions).
 
 
-## Submissions
+**MarkdownPad** is a full-featured Markdown editor for Windows.
 
-Submissions should be placed in the folder, [ML.Tests.Benchmarks](https://github.com/hpcc-systems/ecl-ml/tree/master/ML/Tests/Benchmarks). 
+### Built exclusively for Markdown ###
 
-The name of any test ECL program for verifying a model's correctness should end with '\_verify\_model.ecl'. And, the name of any test ECL program for verifying the execution time of a learner on a large training set should end with '\_runtime\_on\_large\_trainingset.ecl'.
+Enjoy first-class Markdown support with easy access to  Markdown syntax and convenient keyboard shortcuts.
 
-### Test ECL Program for Verifying Created Model's Correctness
+---
 
-The training set of this test ECL program should be small, no more than 25 observations, and should be inline.
+Give them a try:
 
-Also, at the top of the test ECL program, in a comment block, should be an R program that executes an R equivalent learning algorithm on the same training set. There are examples in both Linear\_verify\_model.ecl and Logistic\_verify\_model.ecl. The R code should be setup in the comment block so one came cut and paste it into an R window to execute it. The following is the R code at the top of Linear\_verify\_model.ecl.
+- **Bold** (`Ctrl+B`) and *Italic* (`Ctrl+I`)
+- Quotes (`Ctrl+Q`)
+- Code blocks (`Ctrl+K`)
+- Headings 1, 2, 3 (`Ctrl+1`, `Ctrl+2`, `Ctrl+3`)
+- Lists (`Ctrl+U` and `Ctrl+Shift+O`)
 
-<pre>
-A <- matrix(c(1,0.13197,25.114,3,0.0,72.009,5,0.95613,71.9,7,0.57521,97.91,9,0.0,102.2,
-11,0.23478,118.48,13,0.0,145.83,15,0.0,181.51,17,0.015403,197.38,19,0.0,214.03,
-21,0.16899,216.61,23,0.64912,270.63,25,0.73172,281.17,27,0.64775,295.11,29,0.45092,314.04,
-31,0.54701,331.86,33,0.29632,345.95,35,0.74469,385.31,37,0.18896,390.91,39,0.6868,423.49), nrow = 20, ncol = 3, byrow=TRUE);
+### See your changes instantly with LivePreview ###
 
-Y <- A[, 3];
-X1 <- A[, 1];
-X2 <- A[, 2];
-model <- lm(Y ~ 1 + X1 + X2);
-summary(model)
-</pre>
+Don't guess if your [hyperlink syntax](http://markdownpad.com) is correct; LivePreview will show you exactly what your document looks like every time you press a key.
 
-**NOTE.** It may be worthwhile to look-at and run **example ECL Programs** for the learning algorithms listed above. Some can be found in the folder, [ML.Tests.Explanatory](https://github.com/hpcc-systems/ecl-ml/tree/master/ML/Tests/Explanatory).
+### Make it your own ###
 
-### Test ECL Program for Verifying Execution Time of a Large Training Set
+Fonts, color schemes, layouts and stylesheets are all 100% customizable so you can turn MarkdownPad into your perfect editor.
 
+### A robust editor for advanced Markdown users ###
+
+MarkdownPad supports multiple Markdown processing engines, including standard Markdown, Markdown Extra (with Table support) and GitHub Flavored Markdown.
+
+With a tabbed document interface, PDF export, a built-in image uploader, session management, spell check, auto-save, syntax highlighting and a built-in CSS management interface, there's no limit to what you can do with MarkdownPad.
+
+# Steps
