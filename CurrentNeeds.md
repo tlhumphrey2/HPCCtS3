@@ -5,7 +5,7 @@ This document is for those who have never contributed to our Machine Learning (M
 
 What we hope to cover, here, is everything you need to get started as a contributor. I believe the following list covers everything.
 
- - Get a github account (click [here](#Steps) for instructions).
+ - Get a github account (click [here](#steps) for instructions).
  - Download git onto your PC (click [here](#Steps) for instructions).
  - On github, fork the ML repository (click [here](#Steps) for instructions).
  - Make a local copy of the ML repository from your fork (click [here](#Steps) for instructions).
