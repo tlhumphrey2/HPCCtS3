@@ -1,16 +1,56 @@
-HPCCtS3
-=======
+Beginner Contributor Guide
+==========================
 
-As of 2015/03/30, a new repository exists, BestHPCCoAWS, which lets you deploy a fast running HPCC on AWS. Check it out: https://github.com/tlhumphrey2/BestHPCCoAWS.
+This document is for those who have never contributed to our Machine Learning (ML) Project and/or never contributed to any github project.
 
-HPCCtS3, HPCC tied to S3, enables deployment of HPCC to AWS and saving and restoring THOR files to/from S3 buckets.
+What we hope to cover, here, is everything you need to get started as a contributor. I believe the following list covers everything. By the way, you can use the order of this list to tell you when to do what.
 
-The big thing that HtS3, the main program of this repository, does is copy to/from S3 buckets, files on the THOR nodes of a deployed HPCC System. What is unique about these copies is that they are done in parallel, which makes them much faster than despraying THOR files to the landing zone and then copying to S3 buckets. This means one can deploy an HPCC system, store its files in S3 buckets, then shutdown the system so additional AWS charges aren't incurred. Then, later have HtS3 bring up another HPCC System with the files restored to it. 
+ - Get a github account (click [here](#get-github-account) for instructions).
+ - Download git onto your PC (click [here](#download-git) for instructions).
+ - Setup git onto your PC (click [here](#setup-git) for instructions).
+ - On github, fork the ML repository (click [here](#fork-ml-repository) for instructions).
+ - Make a local copy of the ML repository from your fork (click [here](#make-ml-repository-local-copy) for instructions).
+ - Get access to our THOR cluster for contributors or download a VMWare HPCC System (click [here](#get-access-to-thor-cluster) for instructions).
+ - Download ECL IDE (click [here](#download-ecl-ide) for instructions).
+ - Configure ECL IDE so your local ML repository can be seen in ECL IDE.
+ - Learn ECL (click [here](#configure-ecl-ide) for instructions).
+ - Run some of the example ML programs (click [here](#run-example-ml-programs) for example).
+ - Decide what contribution you want to make (look at our [Current Needs](https://github.com/hpcc-systems/ecl-ml/CurrentNeeds.md)).
+ - Make a branch in your local ML repository for your contribution (click [here](#creating-a-branch) for instructions).
+ - Make a contribution
+ - Create a pull request (click [here](#create-pull-request) for instructions).
 
-HtS3 also configures and deploys and HPCC System to Amazon's AWS using the HPCC Juju Charm.
+## Get Github Account
 
-Included in this repository is documentation, UsingHtS3.pdf, that tells in great detail how to setup and use HtS3. Also, provided in Appendix B of this documentation is a table that briefly describes all scripts in the repository.
+Click [here](https://github.com/join) to begin creating a github account.
 
-I've also added the document, UsingHPCCCharm.pdf, that tells how to use the HPCC Charm with juju charm to deploy HPCC Systems to AWS and probably others as it gets updated.
+## Download git
 
-2014/11/04. Added mkEnv.sh and cpEnv.sh, two bash scripts that enables one to reconfigure an HPCC System deployed to AWS. It enables one to have multiple THOR slave nodes per AWS instance.
+Click [here](https://desktop.github.com/) to download the latest version of Github Desktop.
+
+## Setup git
+
+This github article tells you what to do to setup git: [help.github.com/articles/set-up-git](https://help.github.com/articles/set-up-git/). 
+
+## Fork ML Repository
+
+This github article tells you how to fork a repository: [help.github.com/articles/fork-a-repo](https://help.github.com/articles/fork-a-repo/).
+
+## Make ML Repository Local Copy
+
+You make a local copy of the ML repository by making a local copy of your fork. And, to do this start with Step 2 of the repository fork instructions. [help.github.com/articles/fork-a-repo](https://help.github.com/articles/fork-a-repo/).
+
+## Get Access To THOR Cluster
+
+## Download ECL IDE
+
+Click [here](https://hpccsystems.com/download/developer-tools/ecl-ide) to download the latest version of ECL IDE.
+
+## Configure ECL IDE
+
+## Run Example ML Programs
+
+## Creating a Branch
+
+## Create Pull Request
+
