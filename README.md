@@ -59,6 +59,8 @@ Example ML programs can be found [here](https://github.com/tlhumphrey2/ecl-ml/tr
 
 ## Creating a Branch
 
+A **branch** is like a total copy of your local the ML repository.
+
 This github article gives general information about git branches and tells you how to create a branch and why (see [this](https://github.com/Kunena/Kunena-Forum/wiki/Create-a-new-branch-with-git-and-manage-branches)).
 
 The following terms in this article probably need to be defined:
@@ -75,5 +77,14 @@ git checkout -b add-decisiontree-model-correctness
 
 ## Create Pull Request
 
-This github article gives general information about creating a pull request (see [this](https://help.github.com/articles/creating-a-pull-request)).
+Once you have completed making changes to your branch, you must make us aware of these changes so we can critic them and give you feedback. The way you do that is by submitting a "pull request". But, before submitting a "pull request", there are other things you need to do. So, refer to [this document](https://github.com/hpcc-systems/HPCC-Platform/wiki/Git-step-by-step). This document gives a lot of detailed information. But, I want you to start reading at the section named **(1) Resync**. Here are the steps you want to do.
 
+1. **Resync** using the 4 git commands in the article.
+2. **Create a branch** using the article's instructions or those give [above](#creating-a-branch).
+3. **Make your changes**. After making your changes you can get a list of the changes you have made with the following git command "git status -s".
+4. **Stage** the changes you have made using "git add" (see article).
+5. **Commit staged changes** (see article).
+6. **Push the committed changes** to your github fork (see article).
+7. **Pull Request**. This is done on github. This github article gives general information about creating a pull request (see [this](https://help.github.com/articles/creating-a-pull-request)).
+
+**Upstream** in this article refers to the original ML repository on github, i.e. [here](https://github.com/hpcc-systems/ecl-ml).
