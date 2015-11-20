@@ -7,7 +7,7 @@ What is covered here:
 - [Test ECL Programs for Verifying Model Correctness](#test-ecl-programs-for-verifying-model-correctness)
 - [Test ECL Programs for Verifying Learner's Execution Time on Large Training Sets](#test-ecl-programs-for-verifying-learners-execution-time-on-large-training-sets)
 - [Submission Requirements](#submission-requirements)
-- [Other Information Needed for Submissions](#other-information-needed-for-submissions)
+- [Other Useful Information for Submissions](#other-useful-information-sfor-submissions)
 
 ## Our Current Needs
 
@@ -20,8 +20,6 @@ Currently we need:
  - SoftMax
  - Deep Learning
  - Neural Networks
-
- **NOTE.** **Example ECL Programs** for the above learning algorithms can be found in the folder, [ML.Tests.Explanatory](https://github.com/hpcc-systems/ecl-ml/tree/master/ML/Tests/Explanatory).
 
 2\. Test ECL programs that verify the execution time of the learner on large training sets.
 
@@ -73,4 +71,16 @@ Submissions should be placed in the folder, [ML.Tests.Benchmarks](https://github
 
 The name of any test ECL program for verifying a model's correctness should end with "\_verify\_model.ecl". And, the name of any test ECL program for verifying the execution time of a learner on a large training set should end with "\_runtime\_on\_large\_trainingset.ecl".
 
-## Other Information Needed for Submissions
+For a model correctness test ECL program, place in a comment block at the top of the program, a small R program that executes R's version of the learning algorithm and outputs the model. You don't have to use R. We will accept other statistical languages. But we must be able to run your "other language" program.
+
+## Other Useful Information for Submissions
+
+The example programs given in the folder, [ML.Tests.Explanatory](https://github.com/hpcc-systems/ecl-ml/tree/master/ML/Tests/Explanatory), is a good place to start making a test ECL program that verifies the correctness of the created model for one of the target learning algorithms. All of the target learning algorithms have at least one example program in this folder.
+
+Read the documentation, [LinearRegressionIntroduction.htm and LogisticRegressionIntroduction.htm](https://github.com/hpcc-systems/ecl-ml/tree/master/docs), for the Linear and Logistic test ECL programs in the Benchmarks folder.
+
+**Getting execution times:** After you have ran a test ECL program, you can get execution times in ECL Watch by 1) clicking on your workunit's id,  then 2) click on the "Timers" tab, and then 3) scrolling to the end of the list of timings where you will see "Total cluster time", which is given in seconds.
+
+**Answers to questions** related to HPCC Systems can often be found by doing a Google search that includes "site:hpccsystems.com" (without the quotes).
+
+ 
