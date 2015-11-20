@@ -7,7 +7,7 @@ What is covered here:
 - [Test ECL Programs for Verifying Model Correctness](#test-ecl-programs-for-verifying-model-correctness)
 - [Test ECL Programs for Verifying Learner's Execution Time on Large Training Sets](#test-ecl-programs-for-verifying-learners-execution-time-on-large-training-sets)
 - [Submission Requirements](#submission-requirements)
-- [Other Useful Information for Submissions](#other-useful-information-sfor-submissions)
+- [Other Useful Information for Submissions](#other-useful-information-for-submissions)
 
 ## Our Current Needs
 
