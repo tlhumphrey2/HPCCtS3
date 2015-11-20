@@ -55,7 +55,25 @@ In Perferences, click on the Compiler tab. There are several text boxes. One is 
 
 ## Run Example ML Programs
 
+Example ML programs can be found [here](https://github.com/tlhumphrey2/ecl-ml/tree/master/ML/Tests/Explanatory). Example programs for a particular learning algorithm, e.g. Logistic, will the name of the learning algorithm in its file name. For example, when I searched for example Logistic programs, I found 2 (LogisticRegressionStatistics.ecl and classify_logistic.ecl).
+
 ## Creating a Branch
 
+This github article gives general information about git branches and tells you how to create a branch and why (see [this](https://github.com/Kunena/Kunena-Forum/wiki/Create-a-new-branch-with-git-and-manage-branches)).
+
+The following terms in this article probably need to be defined:
+
+ - **master branch** refers to the main branch (or starting branch) of your local ML repository.
+ - **origin** in a git command, like "git push" refers to your fork on github.
+ - **original branch from official repository** for us that would be the original ML repository, which is [here](https://github.com/hpcc-systems/ecl-ml).
+
+**Example of a branch:** Before you make any changes to your local ML repository, create a branch using git. For example the following git command creates a branch I will use to add to the Benchmark folder a test program for verifying the correctness of the DecisionTree learning algorithm.
+
+<pre>
+git checkout -b add-decisiontree-model-correctness
+</pre>
+
 ## Create Pull Request
+
+This github article gives general information about creating a pull request (see [this](https://help.github.com/articles/creating-a-pull-request)).
 
