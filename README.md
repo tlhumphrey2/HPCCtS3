@@ -8,14 +8,13 @@ What we hope to cover, here, is everything you need to get started as a contribu
  - Get a github account (click [here](#get-github-account) for instructions).
  - Download git onto your PC (click [here](#download-git) for instructions).
  - Setup git onto your PC (click [here](#setup-git) for instructions).
- - On github, fork the ML repository (click [here](#fork-ml-repository) for instructions).
- - Make a local copy of the ML repository from your fork (click [here](#make-ml-repository-local-copy) for instructions).
+ - For the ML repository, make 1) a fork of it on github and 2) a local copy of it  (click [here](#fork-and-make-a-local-copy-of-the-ml-repository) for instructions).
  - Get access to our THOR cluster for contributors or download a VMWare HPCC System (click [here](#get-access-to-thor-cluster) for instructions).
  - Download ECL IDE (click [here](#download-ecl-ide) for instructions).
  - Configure ECL IDE so your local ML repository can be seen in ECL IDE.
  - Learn ECL (click [here](#configure-ecl-ide) for instructions).
  - Run some of the example ML programs (click [here](#run-example-ml-programs) for example).
- - Decide what contribution you want to make (look at our [Current Needs](https://github.com/hpcc-systems/ecl-ml/CurrentNeeds.md)).
+ - Decide what contribution you want to make (look at our [Current Needs](https://github.com/hpcc-systems/ecl-ml/CONTRIBUTING/CurrentNeeds.md)).
  - Make a branch in your local ML repository for your contribution (click [here](#creating-a-branch) for instructions).
  - Make a contribution
  - Create a pull request (click [here](#create-pull-request) for instructions).
@@ -32,13 +31,9 @@ Click [here](https://desktop.github.com/) to download the latest version of Gith
 
 This github article tells you what to do to setup git: [help.github.com/articles/set-up-git](https://help.github.com/articles/set-up-git/). 
 
-## Fork ML Repository
+## Fork and Make a Local Copy of the ML Repository
 
-This github article tells you how to fork a repository: [help.github.com/articles/fork-a-repo](https://help.github.com/articles/fork-a-repo/).
-
-## Make ML Repository Local Copy
-
-You make a local copy of the ML repository by making a local copy of your fork. And, to do this start with Step 2 of the repository fork instructions. [help.github.com/articles/fork-a-repo](https://help.github.com/articles/fork-a-repo/).
+This github article tells you how to fork a repository and make a local copy of it: [help.github.com/articles/fork-a-repo](https://help.github.com/articles/fork-a-repo/).
 
 ## Get Access To THOR Cluster
 
